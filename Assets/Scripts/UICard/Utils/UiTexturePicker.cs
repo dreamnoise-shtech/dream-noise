@@ -12,12 +12,12 @@ namespace Tools.UI.Card
         [SerializeField] private Sprite[] Sprites;
         [SerializeField] private SpriteRenderer MyRenderer { get; set; }
 
-        private void Awake()
+        /*private void Awake()
         {
             MyRenderer = GetComponent<SpriteRenderer>();
 
             if (Sprites.Length > 0)
                 MyRenderer.sprite = Sprites.ToList().RandomItem();
-        }
+        }*/
     }
 }

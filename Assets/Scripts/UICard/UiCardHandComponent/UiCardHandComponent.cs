@@ -134,7 +134,9 @@ namespace Tools.UI.Card
             MyCollider = GetComponent<Collider>();
             MyRigidbody = GetComponent<Rigidbody>();
             MyInput = GetComponent<IMouseInput>();
-            Hand = transform.parent.GetComponentInChildren<IUiCardHand>();
+            //Hand = transform.parent.GetComponentInChildren<IUiCardHand>();
+            GameObject handobj = GameObject.Find("Hand");
+            Hand = handobj.GetComponent<IUiCardHand>();
             MyRenderers = GetComponentsInChildren<SpriteRenderer>();
             MyRenderer = GetComponent<SpriteRenderer>();
 

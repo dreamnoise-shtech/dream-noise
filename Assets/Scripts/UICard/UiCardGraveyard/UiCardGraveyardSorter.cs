@@ -30,6 +30,7 @@ namespace Tools.UI.Card
                 throw new ArgumentException("Can't sort a card list null");
 
             var lastPos = cards.Length - 1;
+            if (lastPos < 0) return;
             var lastCard = cards[lastPos];
             var gravPos = graveyardPosition.position + new Vector3(0, 0, -5);
             var backGravPos = graveyardPosition.position;

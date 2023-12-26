@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Tools.UI.Card
@@ -61,6 +63,15 @@ namespace Tools.UI.Card
                 throw new ArgumentNullException("Null is not a valid argument.");
 
             Cards.Remove(card);
+            NotifyPileChange();
+        }
+
+        public void ClearCards() {
+            foreach(var card in Cards)
+            {
+                UnityEngine.Object.Destroy(card.gameObject);
+            }
+            Cards.Clear();
             NotifyPileChange();
         }
 

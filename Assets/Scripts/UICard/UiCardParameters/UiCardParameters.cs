@@ -150,13 +150,13 @@ namespace Tools.UI.Card
             hoverSpeed = 15f;
 
             height = 0.12f;
-            spacing = -2;
-            bentAngle = 20;
+            spacing = -3;
+            bentAngle = 15;
 
             rotationSpeedP2 = 500;
-            rotationSpeed = 20;
-            movementSpeed = 4;
-            scaleSpeed = 7;
+            rotationSpeed = 30;
+            movementSpeed = 6;
+            scaleSpeed = 10;
 
             startSizeWhenDraw = 0.05f;
             discardedSize = 0.5f;

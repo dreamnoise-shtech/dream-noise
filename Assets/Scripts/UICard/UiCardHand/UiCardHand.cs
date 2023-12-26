@@ -75,8 +75,6 @@ namespace Tools.UI.Card
         {
             if (card == null)
                 throw new ArgumentNullException("Null is not a valid argument.");
-            prog = GameObject.Find("progress");
-            prog.GetComponent<Progress>().Increase();
             SelectedCard = null;
             RemoveCard(card);
             OnCardPlayed?.Invoke(card);
