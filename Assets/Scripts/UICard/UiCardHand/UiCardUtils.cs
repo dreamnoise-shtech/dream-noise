@@ -23,17 +23,6 @@ namespace Tools.UI.Card
 
         /*        [SerializeField] [Tooltip("Prefab of the Card C#")]
                 private GameObject cardPrefabCs;*/
-        [SerializeField]
-        [Tooltip("Prefab of the Fire/Coal Card")]
-        private GameObject cardFirePrefab;
-
-        [SerializeField]
-        [Tooltip("Prefab of the Attack Card")]
-        private GameObject cardAttackPrefab;
-
-        [SerializeField]
-        [Tooltip("Prefab of the Heal Card")]
-        private GameObject cardHealPrefab;
 
         [SerializeField] [Tooltip("World point where the deck is positioned")]
         private Transform deckPosition;
@@ -88,9 +77,19 @@ namespace Tools.UI.Card
                 yield return new WaitForSeconds(0.2f);
                 DrawCard();
             }*/
-            spawnSpecificCard(cardHealPrefab, 0, 3);
-            spawnSpecificCard(cardFirePrefab, 1, 3);
-            spawnSpecificCard(cardAttackPrefab, 2, 4);
+            spawnSpecificCard((GameObject)Resources.Load("CardHealPrefab"), 0, 3);
+            spawnSpecificCard((GameObject)Resources.Load("CardFuelPrefab"), 1, 3);
+            spawnSpecificCard((GameObject)Resources.Load("CardAttackPrefab"), 2, 4);
+            var bonuscards = GameObject.Find("MainDataManager").GetComponent<MainBattleDataManager>().cardHeapBonusCards;
+            foreach (int cardid in bonuscards)
+            {
+                switch(cardid)
+                {
+                    case 12: spawnSpecificCard((GameObject)Resources.Load("CardSleepwalkPrefab"), 12); break;
+                    case 13: spawnSpecificCard((GameObject)Resources.Load("CardDeepDreamPrefab"), 13); break;
+                    case 14: spawnSpecificCard((GameObject)Resources.Load("CardDreamNetPrefab"), 14); break;
+                }
+            }
             DrawCard(2);
         }
 
