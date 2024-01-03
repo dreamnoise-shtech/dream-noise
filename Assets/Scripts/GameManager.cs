@@ -24,6 +24,7 @@ namespace Tools.UI.Card
         private RectTransform actionBarRectTransform;
         private float actionBarOriginalWidth;
         private HealthSystemForDummies playerhp, monsterhp;
+        private UiCardUtils carddrawer;
 
         private int currentFireProcess = 0, neededFireProcess = 20, turnCount = 0;
 
@@ -37,6 +38,13 @@ namespace Tools.UI.Card
         public void MonsterDie(bool isAlive)
         {
             if (isAlive) { return; }
+            if ((m_data.enemy.isBoss) && (m_data.battleResult != 2))
+            {
+                m_data.battleResult = -1;
+                monsterhp = GameObject.Find("Monster").GetComponent<HealthSystemForDummies>();
+                monsterhp.ReviveWithMaximumHealth();
+                return;
+            }
             GameObject spriteGameObject = GameObject.Find("Monster");
             spriteGameObject.SetActive(false);
             if (m_data.battleResult != 2) m_data.battleResult = 1;
@@ -70,8 +78,8 @@ namespace Tools.UI.Card
                 foreach(var buff in playerBuffs)
                 {
                     switch (buff.buffId) {
-                        case 13: // deep dream, from card ID 13, doubles the next attack.
-                            playerbufftext.text += "In deep dream, dealing 2x damage once.\n";
+                        case 5: // deep dream, from card ID 5, doubles the next attack.
+                            playerbufftext.text += "处于梦寐中，打出的下一张战斗牌伤害 * 2。\n";
                             break;
                     }
                 }
@@ -83,11 +91,11 @@ namespace Tools.UI.Card
                 foreach(var buff in enemyBuffs)
                 {
                     switch (buff.buffId) {
-                        case 12: // sleepwalk, from card ID 12, enemy attack itself once.
-                            enemybufftext.text += "Sleepwalking, would attack itself once. \n";
+                        case 4: // sleepwalk, from card ID 4, enemy attack itself once.
+                            enemybufftext.text += "梦游中，下次攻击会攻击自己。 \n";
                             break;
-                        case 14: // dream net, from card ID 14, enemy cannot attack for two turns.
-                            enemybufftext.text += "Captured by a dream net, cannot attack for " + buff.buffRemainingTurn.ToString() + " turns.\n";
+                        case 6: // dream net, from card ID 6, enemy cannot attack for two turns.
+                            enemybufftext.text += "被梦网困住，下 " + buff.buffRemainingTurn.ToString() + " 回合内的攻击无效。\n";
                             break;
                     }
                 }
@@ -98,13 +106,13 @@ namespace Tools.UI.Card
             if (turnCount % m_data.enemy.atkInterval == 0) // turn for enemy to attack
             {
                 tmp.x = actionBarOriginalWidth;
-                var sleepwalkBuff = enemyBuffs.Find(buff => buff.buffId == 12);
-                var dreamNetBuff = enemyBuffs.Find(buff => buff.buffId == 14);
-                if (dreamNetBuff != null) // dream net, from card ID 14, enemy cannot attack in 2 turns.
+                var sleepwalkBuff = enemyBuffs.Find(buff => buff.buffId == 4);
+                var dreamNetBuff = enemyBuffs.Find(buff => buff.buffId == 6);
+                if (dreamNetBuff != null) // dream net, from card ID 6, enemy cannot attack in 2 turns.
                 {
                     // intentionally left blank, i.e. do nothing
                 }
-                else if (sleepwalkBuff != null) // sleepwalk, from card ID 12, enemy attack itself once.
+                else if (sleepwalkBuff != null) // sleepwalk, from card ID 4, enemy attack itself once.
                 {
                     monsterhp.AddToCurrentHealth(-m_data.enemy.atk);
                     enemyBuffs.Remove(sleepwalkBuff);
@@ -114,18 +122,18 @@ namespace Tools.UI.Card
             actionBarRectTransform.transform.localScale = tmp; // Set action bar
             // ---^^---
 
-            var carddrawer = GameObject.Find("Deck").GetComponent<UiCardUtils>();
             carddrawer.DrawCard(2);
         }
 
         void Awake()
         {
             Instance = this;
+            carddrawer = GameObject.Find("Deck").GetComponent<UiCardUtils>();
         }
 
         void damageEnemy(int dmg)
         {
-            var deepdreamBuff = playerBuffs.Find(buff => buff.buffId == 13); // deep dream, from card ID 13, 2x dmg
+            var deepdreamBuff = playerBuffs.Find(buff => buff.buffId == 5); // deep dream, from card ID 5, 2x dmg
             if (deepdreamBuff != null)
             {
                 monsterhp.AddToCurrentHealth(-dmg * 2);
@@ -161,11 +169,15 @@ namespace Tools.UI.Card
                 CardInfo cardinfo = card.gameObject.GetComponent<CardInfo>();
 
                 var fireprogress = GameObject.Find("FireProgress").GetComponent<TMP_Text>();
+                void addOrRefreshBuff(List<BuffState> buffList, int buffId, int buffTurn = -1)
+                {
+                    buffList.RemoveAll(buff => buff.buffId == buffId);
+                    buffList.Add(new BuffState(buffId, buffTurn));
+                }
                 switch (cardinfo.id)
                 {
-                    case 0: // TODO: remove this old test card, introduce new card
-                        playerhp.AddToCurrentHealth(40); break;
-                    case 1: // TODO: remove this old test card, introduce new card
+                    
+                    case 0:
                         currentFireProcess++;
                         fireprogress.text = "Heat: " + currentFireProcess.ToString() + " / " + neededFireProcess.ToString();
                         if (currentFireProcess == neededFireProcess)
@@ -174,21 +186,41 @@ namespace Tools.UI.Card
                             monsterhp.Kill();
                         }
                         break;
-                    case 2: // TODO: remove this old test card, introduce new card
-                        damageEnemy(60);
+                    case 1:
+                        damageEnemy(4);
                         break;
-                    case 12: // sleepwalk, enemy debuff ID=12
-                        damageEnemy(20);
-                        enemyBuffs.Add(new BuffState(12));
+                    case 2:
+                        damageEnemy(3);
                         break;
-                    case 13: // deep dream, player buff ID=13
-                        playerBuffs.Add(new BuffState(13));
+                    case 3:
+                        damageEnemy(6);
                         break;
-                    case 14: // dream net, enemy debuff ID=14
-                        damageEnemy(30);
-                        enemyBuffs.Add(new BuffState(14));
+                    case 4: // sleepwalk, enemy debuff ID=4
+                        damageEnemy(2);
+                        addOrRefreshBuff(enemyBuffs, 4);
                         break;
-
+                    case 5: // deep dream, player buff ID=5
+                        addOrRefreshBuff(playerBuffs, 5);
+                        break;
+                    case 6: // dream net, enemy debuff ID=6
+                        damageEnemy(3);
+                        addOrRefreshBuff(enemyBuffs, 6, 2);
+                        break;
+                    case 7:
+                        carddrawer.DrawCard(3);
+                        carddrawer.PlayCard();
+                        break;
+                    case 8:
+                        carddrawer.spawnSpecificCardInGraveyard(9, 5);
+                        break;
+                    case 9:
+                        carddrawer.DrawCard(1);
+                        damageEnemy(2);
+                        playerhp.AddToCurrentHealth(2);
+                        break;
+                    case 26:
+                        playerhp.AddToCurrentHealth(4);
+                        break;
                 }
             };
         }

@@ -21,11 +21,10 @@ namespace Tools.UI.Card
 
         private int Count { get; set; }
 
-        /*        [SerializeField] [Tooltip("Prefab of the Card C#")]
-                private GameObject cardPrefabCs;*/
-
         [SerializeField] [Tooltip("World point where the deck is positioned")]
         private Transform deckPosition;
+
+        private List<GameObject> m_prefabTable; // Ref to ID-Prefab table.
 
         [SerializeField]
         [Tooltip("Reference to Graveyard")]
@@ -50,12 +49,14 @@ namespace Tools.UI.Card
             rng = new System.Random();
             CardHand = transform.parent.GetComponentInChildren<UiCardHand>();
             CardHeap = new List<IUiCard>();
+            m_prefabTable = GameObject.Find("MainDataManager").GetComponent<MainBattleDataManager>().prefabs;
         }
 
-        private void spawnSpecificCard(GameObject prefab, int id, int num = 1)
+        public void spawnSpecificCard(int id, int num = 1)
         {
             for (int i = 0; i < num; i++)
             {
+                var prefab = m_prefabTable[id];
                 var cardGo = Instantiate(prefab, CardHeapView);
                 cardGo.name = "Card_" + Count;
                 var card = cardGo.GetComponent<IUiCard>();
@@ -69,6 +70,25 @@ namespace Tools.UI.Card
             }
         }
 
+        public void spawnSpecificCardInGraveyard(int id, int num = 1)
+        {
+            for (int i = 0; i < num; i++)
+            {
+                var prefab = m_prefabTable[id];
+                var cardGo = Instantiate(prefab, CardHeapView);
+                cardGo.name = "Card_" + Count;
+                var card = cardGo.GetComponent<IUiCard>();
+                var cardinfo = cardGo.GetComponent<CardInfo>();
+                cardinfo.prefab = prefab;
+                cardinfo.id = id;
+                //card.transform.position = deckPosition.position;
+                Count++;
+                var graveyardRef = GameObject.Find("Graveyard").GetComponent<UiCardGraveyard>();
+                graveyardRef.AddCard(card);
+                //UnityEngine.Debug.Log(card.gameObject.GetComponent<OriginalPrefab>().prefab);
+            }
+        }
+
         private void Start()
         {
             //starting cards
@@ -77,18 +97,13 @@ namespace Tools.UI.Card
                 yield return new WaitForSeconds(0.2f);
                 DrawCard();
             }*/
-            spawnSpecificCard((GameObject)Resources.Load("CardHealPrefab"), 0, 3);
-            spawnSpecificCard((GameObject)Resources.Load("CardFuelPrefab"), 1, 3);
-            spawnSpecificCard((GameObject)Resources.Load("CardAttackPrefab"), 2, 4);
+/*            spawnSpecificCard(26, 3);
+            spawnSpecificCard(0, 3);
+            spawnSpecificCard(1, 4);*/
             var bonuscards = GameObject.Find("MainDataManager").GetComponent<MainBattleDataManager>().cardHeapBonusCards;
             foreach (int cardid in bonuscards)
             {
-                switch(cardid)
-                {
-                    case 12: spawnSpecificCard((GameObject)Resources.Load("CardSleepwalkPrefab"), 12); break;
-                    case 13: spawnSpecificCard((GameObject)Resources.Load("CardDeepDreamPrefab"), 13); break;
-                    case 14: spawnSpecificCard((GameObject)Resources.Load("CardDreamNetPrefab"), 14); break;
-                }
+                spawnSpecificCard(cardid);
             }
             DrawCard(2);
         }
@@ -113,15 +128,10 @@ namespace Tools.UI.Card
             {
                 if (CardHeap.Count == 0)
                 {
-                    /*                spawnSpecificCard(cardHealPrefab, 3);
-                                    spawnSpecificCard(cardFirePrefab, 3);
-                                    spawnSpecificCard(cardAttackPrefab, 4);*/
                     foreach (var checkingcard in m_graveyard.Cards)
                     {
-                        //TODO!!! Wrong implementation.
-                        //UnityEngine.Debug.Log(checkingcard.gameObject.GetComponent<OriginalPrefab>().prefab);
                         var cardinfo = checkingcard.gameObject.GetComponent<CardInfo>();
-                        spawnSpecificCard(cardinfo.prefab, cardinfo.id);
+                        spawnSpecificCard(cardinfo.id);
                     }
                     m_graveyard.ClearCards();
                     if (CardHeap.Count == 0)

@@ -990,8 +990,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: N/A
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 5302535af1044152a457ed104f1f4b91, type: 2}
-  m_sharedMaterial: {fileID: 2164040, guid: 5302535af1044152a457ed104f1f4b91, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: c734fe1ac70891f4d998e713ecf2e734, type: 2}
+  m_sharedMaterial: {fileID: -5608786716299690834, guid: c734fe1ac70891f4d998e713ecf2e734, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -1759,8 +1759,8 @@ MonoBehaviour:
       m_Calls: []
   m_text: N/A
   m_isRightToLeft: 0
-  m_fontAsset: {fileID: 11400000, guid: 5302535af1044152a457ed104f1f4b91, type: 2}
-  m_sharedMaterial: {fileID: 2164040, guid: 5302535af1044152a457ed104f1f4b91, type: 2}
+  m_fontAsset: {fileID: 11400000, guid: c734fe1ac70891f4d998e713ecf2e734, type: 2}
+  m_sharedMaterial: {fileID: -5608786716299690834, guid: c734fe1ac70891f4d998e713ecf2e734, type: 2}
   m_fontSharedMaterials: []
   m_fontMaterial: {fileID: 0}
   m_fontMaterials: []
@@ -2717,9 +2717,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: fe4e6242e55c49f4196ccec629c5b6b3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  cardFirePrefab: {fileID: 2881527499195764280, guid: a7692081777dc7e469acf3a707aa9f6a, type: 3}
-  cardAttackPrefab: {fileID: 1424291179388128332, guid: 68490b0e0db53994ead84c9d59c0f605, type: 3}
-  cardHealPrefab: {fileID: 6375621542268608620, guid: d8d2cbae0a994f44d8727c965bb02127, type: 3}
   deckPosition: {fileID: 1773805236}
   m_graveyard: {fileID: 1759191726}
   CardHeapView: {fileID: 1049335867}

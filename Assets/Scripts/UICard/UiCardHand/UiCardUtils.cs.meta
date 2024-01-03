@@ -4,13 +4,8 @@ MonoImporter:
   externalObjects: {}
   serializedVersion: 2
   defaultReferences:
-  - cardFirePrefab: {fileID: 2881527499195764280, guid: a7692081777dc7e469acf3a707aa9f6a, type: 3}
-  - cardAttackPrefab: {fileID: 1424291179388128332, guid: 68490b0e0db53994ead84c9d59c0f605, type: 3}
-  - cardHealPrefab: {fileID: 6375621542268608620, guid: d8d2cbae0a994f44d8727c965bb02127, type: 3}
-  - cardDreamNetPrefab: {fileID: 675168400203151421, guid: d7f211aee164948428727ab27a466461, type: 3}
-  - cardDeepDreamPrefab: {fileID: 5304200469941707317, guid: fc15336bab355f44b967acc1a51c16cf, type: 3}
-  - cardSleepwalkPrefab: {fileID: 7689819462013062534, guid: 7eefe217f5ad8f544b4f3aa584effa95, type: 3}
   - deckPosition: {instanceID: 0}
+  - m_prefabTable: {fileID: 11400000, guid: 5aca2015e53d40545b606a4631c83387, type: 2}
   - m_graveyard: {instanceID: 0}
   - CardHeapView: {instanceID: 0}
   executionOrder: 0
