@@ -20,16 +20,21 @@ namespace Tools.UI.Card
 
         public override void OnEnterState()
         {
+            CardInfo tmp = Handler.gameObject.GetComponent<CardInfo>();
+            tmp.infoPage.SetActive(true);
             MakeRenderFirst();
             SubscribeInput();
             CachePreviousValues();
             SetScale();
             SetPosition();
             SetRotation();
+
         }
 
         public override void OnExitState()
         {
+            CardInfo tmp = Handler.gameObject.GetComponent<CardInfo>();
+            tmp.infoPage.SetActive(false);
             ResetValues();
             UnsubscribeInput();
             DisableCollision();

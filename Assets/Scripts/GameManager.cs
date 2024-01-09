@@ -20,6 +20,7 @@ namespace Tools.UI.Card
             }
         }
         private List<BuffState> playerBuffs = new List<BuffState>(), enemyBuffs = new List<BuffState>();
+        private TMP_Text playerbufftext, enemybufftext;
         private MainBattleDataManager m_data;
         private RectTransform actionBarRectTransform;
         private float actionBarOriginalWidth;
@@ -51,6 +52,34 @@ namespace Tools.UI.Card
             SceneManager.LoadScene("Main");
         }
 
+        private void UpdateBuffText(TMP_Text buffText, List<BuffState> buffs)
+        {
+            if (buffs.Count == 0) {
+                buffText.text = "N/A";
+                return;
+            }
+            else
+            {
+                buffText.text = "";
+                foreach(var buff in buffs)
+                {
+                    switch (buff.buffId)
+                    {
+                        case 4: // sleepwalk, from card ID 4, enemy attack itself once.
+                            buffText.text += "梦游中，下次攻击会攻击自己。 \n";
+                            break;
+                        case 5: // deep dream, from card ID 5, doubles the next attack.
+                            buffText.text += "处于梦寐中，打出的下一张战斗牌伤害 * 2。\n";
+                            break;
+                        case 6: // dream net, from card ID 6, enemy cannot attack for two turns.
+                            buffText.text += "被梦网困住，下 " + buff.buffRemainingTurn.ToString() + " 回合内的攻击无效。\n";
+                            break;
+                    }
+                }
+                return;
+            }
+        }
+
         public void TurnLogic()
         {
             turnCount++;
@@ -69,37 +98,8 @@ namespace Tools.UI.Card
             }
             enemyBuffs.RemoveAll(buff => buff.buffRemainingTurn == 0);
             // ---vv--- Show buffs
-            var playerbufftext = GameObject.Find("PlayerBuffText").GetComponent<TMP_Text>();
-            var enemybufftext = GameObject.Find("EnemyBuffText").GetComponent<TMP_Text>();
-            if (playerBuffs.Count == 0) { playerbufftext.text = "N/A"; }
-            else
-            {
-                playerbufftext.text = "";
-                foreach(var buff in playerBuffs)
-                {
-                    switch (buff.buffId) {
-                        case 5: // deep dream, from card ID 5, doubles the next attack.
-                            playerbufftext.text += "处于梦寐中，打出的下一张战斗牌伤害 * 2。\n";
-                            break;
-                    }
-                }
-            }
-            if (enemyBuffs.Count == 0) { enemybufftext.text = "N/A"; }
-            else
-            {
-                enemybufftext.text = "";
-                foreach(var buff in enemyBuffs)
-                {
-                    switch (buff.buffId) {
-                        case 4: // sleepwalk, from card ID 4, enemy attack itself once.
-                            enemybufftext.text += "梦游中，下次攻击会攻击自己。 \n";
-                            break;
-                        case 6: // dream net, from card ID 6, enemy cannot attack for two turns.
-                            enemybufftext.text += "被梦网困住，下 " + buff.buffRemainingTurn.ToString() + " 回合内的攻击无效。\n";
-                            break;
-                    }
-                }
-            }
+            UpdateBuffText(playerbufftext, playerBuffs);
+            UpdateBuffText(enemybufftext, enemyBuffs);
             // ---vv--- Enemy Action, action bar
             var tmp = actionBarRectTransform.transform.localScale;
             tmp.x = actionBarOriginalWidth * (turnCount % m_data.enemy.atkInterval) / (float)(m_data.enemy.atkInterval);
@@ -145,7 +145,8 @@ namespace Tools.UI.Card
         // Start is called before the first frame update
         void Start()
         {
-
+            playerbufftext = GameObject.Find("PlayerBuffText").GetComponent<TMP_Text>();
+            enemybufftext = GameObject.Find("EnemyBuffText").GetComponent<TMP_Text>();
             actionBarRectTransform = GameObject.Find("MonsterActionBar").GetComponent<RectTransform>();
             actionBarOriginalWidth = actionBarRectTransform.transform.localScale.x;
             var tmp = actionBarRectTransform.transform.localScale;
@@ -176,7 +177,6 @@ namespace Tools.UI.Card
                 }
                 switch (cardinfo.id)
                 {
-                    
                     case 0:
                         currentFireProcess++;
                         fireprogress.text = "Heat: " + currentFireProcess.ToString() + " / " + neededFireProcess.ToString();
@@ -222,6 +222,8 @@ namespace Tools.UI.Card
                         playerhp.AddToCurrentHealth(4);
                         break;
                 }
+                UpdateBuffText(playerbufftext, playerBuffs);
+                UpdateBuffText(enemybufftext, enemyBuffs);
             };
         }
 

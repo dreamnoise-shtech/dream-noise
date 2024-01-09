@@ -8,10 +8,22 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 668240602163910394, guid: da89c93580533da4abe22dd655a7d0ca, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 21300000, guid: 90bdd724c6395d6459861a26f194fe92, type: 3}
+    - target: {fileID: 668240602163910394, guid: da89c93580533da4abe22dd655a7d0ca, type: 3}
+      propertyPath: m_WasSpriteAssigned
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 1580708005931881849, guid: da89c93580533da4abe22dd655a7d0ca, type: 3}
       propertyPath: m_Sprite
       value: 
       objectReference: {fileID: 21300000, guid: 425077a1c5822464596b9d4d180757d4, type: 3}
+    - target: {fileID: 1768561971119246383, guid: da89c93580533da4abe22dd655a7d0ca, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 3245573509686006908, guid: da89c93580533da4abe22dd655a7d0ca, type: 3}
       propertyPath: m_Name
       value: CardID0
