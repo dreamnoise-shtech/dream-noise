@@ -51,6 +51,11 @@ namespace Tools.UI.Card
             SceneManager.LoadScene("Battle");
         }
 
+        public void exitGame()
+        {
+            UnityEngine.Application.Quit();
+        }
+
         public void fightBoss()
         {
             List<int> boss_id_list = new List<int>() { 5, 6, 7, 8 };
