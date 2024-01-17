@@ -128,6 +128,8 @@ namespace Tools.UI.Card
             {
                 if (CardHeap.Count == 0)
                 {
+                    // out of card in cardheap, getting back from graveyard
+                    GameObject.Find("GameState").GetComponent<GameManager>().WriteBattleLog($"由于牌堆抽空，将所有弃牌 ({m_graveyard.Cards.Count}张) 洗入牌堆中。");
                     foreach (var checkingcard in m_graveyard.Cards)
                     {
                         var cardinfo = checkingcard.gameObject.GetComponent<CardInfo>();

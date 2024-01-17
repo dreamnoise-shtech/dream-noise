@@ -26,20 +26,34 @@ namespace Tools.UI.Card
     public class MainManager : MonoBehaviour
     {
         private MainBattleDataManager m_data;
-        private GameObject upgradepopup;
+        public GameObject upgradePopup;
+        public GameObject battleLogPopup;
         private System.Random m_random = new System.Random();
         public List<EnemyType> allEnemy = new List<EnemyType>(20);
         private int reward1, reward2, reward3;
-        public int gameTowerLevel = 1;
         public void fightEnemy()
         {
-            m_data.enemy = allEnemy[m_random.Next(1, 4)];
+            List<int> enemy_id_list = new List<int>();
+            switch(m_data.gameTowerLevel)
+            {
+                case 1:
+                    enemy_id_list = new List<int> { 1, 2 };
+                    break;
+                case 2:
+                    enemy_id_list = new List<int> { 2, 3, 4 };
+                    break;
+                case 3:
+                    enemy_id_list = new List<int> { 2, 3, 4, 5 };
+                    break;
+            }
+            m_data.enemy = allEnemy[enemy_id_list[m_random.Next(enemy_id_list.Count)]];
             SceneManager.LoadScene("Battle");
         }
 
         public void fightBoss()
         {
-            m_data.enemy = allEnemy[6];
+            List<int> boss_id_list = new List<int>() { 5, 5, 6, 6 };
+            m_data.enemy = allEnemy[boss_id_list[m_data.gameTowerLevel]];
             SceneManager.LoadScene("Battle");
         }
 
@@ -47,26 +61,32 @@ namespace Tools.UI.Card
         {
             m_data.cardHeapBonusCards.Add(reward1);
             updateCardHeapScroll();
-            upgradepopup.SetActive(false);
+            upgradePopup.SetActive(false);
         }
 
         public void upgrade2()
         {
             m_data.cardHeapBonusCards.Add(reward2);
             updateCardHeapScroll();
-            upgradepopup.SetActive(false);
+            upgradePopup.SetActive(false);
         }
 
         public void upgrade3()
         {
             m_data.cardHeapBonusCards.Add(reward3);
             updateCardHeapScroll();
-            upgradepopup.SetActive(false);
+            upgradePopup.SetActive(false);
         }
 
         public void rejectupgrade()
         {
-            upgradepopup.SetActive(false);
+            upgradePopup.SetActive(false);
+        }
+
+        public void closebattlelog()
+        {
+            m_data.battleLog = "";
+            battleLogPopup.SetActive(false);
         }
 
         public void updateCardHeapScroll()
@@ -104,33 +124,45 @@ namespace Tools.UI.Card
         void Start()
         {
             m_data = GameObject.Find("MainDataManager").GetComponent<MainBattleDataManager>();
-            upgradepopup = GameObject.Find("UpgradePopup"); // show the upgrade menu
-            if (m_data.battleResult > 0) // Main scene is not at fresh start, but is just loaded by a battle scene and it won.
+            if (m_data.battleResult != -1) // Main scene is not fresh start, either lost or won
             {
-                if (m_data.enemy.isBoss) gameTowerLevel++;
-                List<int> rewardsList = m_data.enemy.rewards;
-                int m_randomPicker()
+                battleLogPopup.SetActive(true);
+                GameObject.Find("BattleLogText").GetComponent<TMP_Text>().text = m_data.battleLog;
+                if (m_data.battleResult > 0) // Main scene is not at fresh start, but is just loaded by a battle scene and it won.
                 {
-                    return rewardsList[m_random.Next(0, rewardsList.Count)];
+                    if (m_data.enemy.isBoss) m_data.gameTowerLevel++;
+                    List<int> rewardsList = m_data.enemy.rewards;
+                    int m_randomPicker()
+                    {
+                        return rewardsList[m_random.Next(0, rewardsList.Count)];
+                    }
+                    reward1 = m_randomPicker();
+                    reward2 = m_randomPicker();
+                    reward3 = m_randomPicker();
+                    upgradePopup.SetActive(true);
+                    var upgrade1Text = GameObject.Find("Upgrade1Text").GetComponent<TMP_Text>();
+                    var upgrade2Text = GameObject.Find("Upgrade2Text").GetComponent<TMP_Text>();
+                    var upgrade3Text = GameObject.Find("Upgrade3Text").GetComponent<TMP_Text>();
+                    upgrade1Text.text = $"将一张 {m_data.cardNames[reward1]} 加入牌堆";
+                    upgrade2Text.text = $"将一张 {m_data.cardNames[reward2]} 加入牌堆";
+                    upgrade3Text.text = $"将一张 {m_data.cardNames[reward3]} 加入牌堆";
                 }
-                reward1 = m_randomPicker();
-                reward2 = m_randomPicker();
-                reward3 = m_randomPicker();
-                var upgrade1Text = GameObject.Find("Upgrade1Text").GetComponent<TMP_Text>();
-                var upgrade2Text = GameObject.Find("Upgrade2Text").GetComponent<TMP_Text>();
-                var upgrade3Text = GameObject.Find("Upgrade3Text").GetComponent<TMP_Text>();
-                upgrade1Text.text = $"将一张 {m_data.cardNames[reward1]} 加入牌堆";
-                upgrade2Text.text = $"将一张 {m_data.cardNames[reward2]} 加入牌堆";
-                upgrade3Text.text = $"将一张 {m_data.cardNames[reward3]} 加入牌堆";
-                upgradepopup.SetActive(true);
+                else upgradePopup.SetActive(false);
             }
-            else upgradepopup.SetActive(false);
-
+            else
+            {
+                upgradePopup.SetActive(false);
+                battleLogPopup.SetActive(false);
+            }
             updateCardHeapScroll();
-            GameObject.Find("TowerLevel").GetComponent<TMP_Text>().text = $"当前梦境层数：{gameTowerLevel}";
 
-            m_data.playerHp = 30;
-            m_data.battleResult = -1;
+            GameObject.Find("TowerLevel").GetComponent<TMP_Text>().text = $"当前梦境层数：{m_data.gameTowerLevel}";
+            GameObject.Find("CurrentHp").GetComponent<TMP_Text>().text = $"当前 HP：{m_data.playerHp}";
+            if (m_data.gameTowerLevel == 4)
+            {
+                GameObject.Find("TowerLevel").GetComponent<TMP_Text>().text = "通关！梦境层数已重设为 1";
+                m_data.gameTowerLevel = 1;
+            }
         }
 
         // Update is called once per frame
