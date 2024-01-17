@@ -7,6 +7,7 @@ using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 using TMPro;
 using System.Linq.Expressions;
+using static System.Net.Mime.MediaTypeNames;
 
 namespace Tools.UI.Card
 {
@@ -52,28 +53,54 @@ namespace Tools.UI.Card
 
         public void fightBoss()
         {
-            List<int> boss_id_list = new List<int>() { 5, 5, 6, 6 };
+            List<int> boss_id_list = new List<int>() { 5, 6, 7, 8 };
             m_data.enemy = allEnemy[boss_id_list[m_data.gameTowerLevel]];
             SceneManager.LoadScene("Battle");
         }
 
+        const int rewardBuffStartID = 28;
+
         public void upgrade1()
         {
-            m_data.cardHeapBonusCards.Add(reward1);
+            if (reward1 < rewardBuffStartID)
+            {
+                m_data.cardHeapBonusCards.Add(reward1);
+            }
+            else
+            {
+                int buff_reward = reward1 - rewardBuffStartID;
+                m_data.rewardBuffs[buff_reward] = true;
+            }
             updateCardHeapScroll();
             upgradePopup.SetActive(false);
         }
 
         public void upgrade2()
         {
-            m_data.cardHeapBonusCards.Add(reward2);
+            if (reward2 < rewardBuffStartID)
+            {
+                m_data.cardHeapBonusCards.Add(reward2);
+            }
+            else
+            {
+                int buff_reward = reward2 - rewardBuffStartID;
+                m_data.rewardBuffs[buff_reward] = true;
+            }
             updateCardHeapScroll();
             upgradePopup.SetActive(false);
         }
 
         public void upgrade3()
         {
-            m_data.cardHeapBonusCards.Add(reward3);
+            if (reward3 < rewardBuffStartID)
+            {
+                m_data.cardHeapBonusCards.Add(reward3);
+            }
+            else
+            {
+                int buff_reward = reward3 - rewardBuffStartID;
+                m_data.rewardBuffs[buff_reward] = true;
+            }
             updateCardHeapScroll();
             upgradePopup.SetActive(false);
         }
@@ -106,18 +133,45 @@ namespace Tools.UI.Card
                     }
                     else
                     {
-                        result += $"卡名: {m_data.cardNames[currentID]}, 数量: {count}\n";
+                        result += $"卡名: {m_data.cardNames[currentID]}, 数量: {count}，效果：{m_data.cardDescriptionText[currentID]}\n";
                         currentID = sortedIDList[i];
                         count = 1;
                     }
                 }
 
                 // Output the last ID and count
-                result += $"卡名: {m_data.cardNames[currentID]}, 数量: {count}";
+                result += $"卡名: {m_data.cardNames[currentID]}, 数量: {count}，效果：{m_data.cardDescriptionText[currentID]}\n";
                 return result;
             }
             var cardScrollText = GameObject.Find("CardScrollText").GetComponent<TMP_Text>();
             cardScrollText.text = CountDistinctIDs(m_data.cardHeapBonusCards); // TODO: Output it.
+            for (int i=0;i<10;i++)
+            {
+                if (m_data.rewardBuffs[i])
+                {
+                    switch(i)
+                    {
+                        case 0:
+                            cardScrollText.text += "已佩戴梦帽，防御力 1。\n";
+                            break;
+                        case 1:
+                            cardScrollText.text += "已穿上梦服，防御力 2。\n";
+                            break;
+                        case 2:
+                            cardScrollText.text += "已招募厨师，炖食锅恢复力 +6。\n";
+                            break;
+                        case 3:
+                            cardScrollText.text += "已招募医师，每次进入战斗时恢复 10 生命。\n";
+                            break;
+                        case 4:
+                            cardScrollText.text += "已招募捕梦人，减免 20% 伤害。\n";
+                            break;
+                        case 5:
+                            cardScrollText.text += "已招募机工，燃料为梦火提供提供 20% 额外热量。\n";
+                            break;
+                    }
+                }
+            }
         }
 
         // Start is called before the first frame update
@@ -140,12 +194,12 @@ namespace Tools.UI.Card
                     reward2 = m_randomPicker();
                     reward3 = m_randomPicker();
                     upgradePopup.SetActive(true);
-                    var upgrade1Text = GameObject.Find("Upgrade1Text").GetComponent<TMP_Text>();
-                    var upgrade2Text = GameObject.Find("Upgrade2Text").GetComponent<TMP_Text>();
-                    var upgrade3Text = GameObject.Find("Upgrade3Text").GetComponent<TMP_Text>();
-                    upgrade1Text.text = $"将一张 {m_data.cardNames[reward1]} 加入牌堆";
-                    upgrade2Text.text = $"将一张 {m_data.cardNames[reward2]} 加入牌堆";
-                    upgrade3Text.text = $"将一张 {m_data.cardNames[reward3]} 加入牌堆";
+                    var upgrade1sprite = GameObject.Find("Upgrade1Sprite").GetComponent<UnityEngine.UI.Image>();
+                    var upgrade2sprite = GameObject.Find("Upgrade2Sprite").GetComponent<UnityEngine.UI.Image>();
+                    var upgrade3sprite = GameObject.Find("Upgrade3Sprite").GetComponent<UnityEngine.UI.Image>();
+                    upgrade1sprite.sprite = m_data.cardInfoSprites[reward1];
+                    upgrade2sprite.sprite = m_data.cardInfoSprites[reward2];
+                    upgrade3sprite.sprite = m_data.cardInfoSprites[reward3];
                 }
                 else upgradePopup.SetActive(false);
             }

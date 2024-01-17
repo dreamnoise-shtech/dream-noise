@@ -32,6 +32,8 @@ namespace Tools.UI.Card
         private int currentFireProcess = 0, neededFireProcess = 20, turnCount = 0, cardsUsed = 0;
         public Animator playerOverlay, monsterOverlay;
 
+        private bool fuelWin = false;
+
         public void PlayerDie(bool isAlive)
         {
             if (isAlive) { return; }
@@ -45,7 +47,7 @@ namespace Tools.UI.Card
         public void MonsterDie(bool isAlive)
         {
             if (isAlive) { return; }
-            if ((m_data.enemy.isBoss) && (m_data.battleResult != 2))
+            if ((m_data.enemy.isBoss) && (!fuelWin))
             {
                 m_data.battleResult = -1;
                 WriteBattleLog("敌方 Boss 被伤害击杀，借助梦境力量重生。");
@@ -59,6 +61,11 @@ namespace Tools.UI.Card
             spriteGameObject.SetActive(false);
             if (m_data.battleResult != 2) m_data.battleResult = 1;
             SceneManager.LoadScene("Main");
+        }
+
+        public void TestWin()
+        {
+            fuelUsed(999);
         }
 
         public void PlayerHealthChange(CurrentHealth currentHealth)
@@ -218,6 +225,14 @@ namespace Tools.UI.Card
         void damagePlayer(int dmg)
         {
             int finalDmg = dmg;
+            if (m_data.rewardBuffs[4])
+            {
+                WriteBattleLog("捕梦人减轻了玩家受到的伤害。");
+                finalDmg = (int)((float)finalDmg * 0.8f);
+            }
+            if (m_data.rewardBuffs[0]) finalDmg -= 1;
+            if (m_data.rewardBuffs[1]) finalDmg -= 2;
+            if (finalDmg < 0) return;
             WriteBattleLog($"玩家受到 {finalDmg} 伤害。");
             playerhp.AddToCurrentHealth(-finalDmg);
             return;
@@ -227,11 +242,12 @@ namespace Tools.UI.Card
         {
             var fireprogress = GameObject.Find("FireProgress").GetComponent<TMP_Text>();
             currentFireProcess += fuels;
-            fireprogress.text = "Heat: " + currentFireProcess.ToString() + " / " + neededFireProcess.ToString();
-            WriteBattleLog($"玩家供应了 {fuels} 点燃料，现有 {currentFireProcess} 点燃料。");
+            fireprogress.text = "梦火: " + currentFireProcess.ToString() + " / " + neededFireProcess.ToString();
+            WriteBattleLog($"玩家供应了 {fuels} 点燃料，现有 {currentFireProcess} 点梦火。");
             if (currentFireProcess >= neededFireProcess)
             {
                 m_data.battleResult = 2; // fuel win, see MainBattleDataManager
+                fuelWin = true;
                 WriteBattleLog($"玩家供应了足量 ({neededFireProcess}) 燃料，点燃梦火获胜。");
                 monsterhp.Kill();
             }
@@ -240,6 +256,7 @@ namespace Tools.UI.Card
         // Start is called before the first frame update
         void Start()
         {
+            fuelWin = false;
             playerbufftext = GameObject.Find("PlayerBuffText").GetComponent<TMP_Text>();
             enemybufftext = GameObject.Find("EnemyBuffText").GetComponent<TMP_Text>();
             battleeventtext = GameObject.Find("BattleEventText").GetComponent<TMP_Text>();
@@ -259,8 +276,22 @@ namespace Tools.UI.Card
             monsterhp.ReviveWithMaximumHealth();
             playerhp.AddToMaximumHealth(m_data.playerMaxHp);
             playerhp.ReviveWithCustomHealth(m_data.playerHp);
+
+            if (m_data.rewardBuffs[3])
+            {
+                WriteBattleLog("医师在战斗开始前提供了治疗。");
+                playerhp.AddToCurrentHealth(10);
+            }
+
             neededFireProcess = m_data.enemy.fuelToKill;
-            GameObject.Find("FireProgress").GetComponent<TMP_Text>().text = "Heat: " + currentFireProcess.ToString() + " / " + neededFireProcess.ToString();
+
+            if (m_data.rewardBuffs[5])
+            {
+                WriteBattleLog("机工使点燃梦火所需燃料减少。");
+                neededFireProcess = (int)((float)neededFireProcess / 1.2f);
+            }
+
+            GameObject.Find("FireProgress").GetComponent<TMP_Text>().text = "梦火: " + currentFireProcess.ToString() + " / " + neededFireProcess.ToString();
             m_data.battleLog = "";
 
 
@@ -300,7 +331,7 @@ namespace Tools.UI.Card
                         damageEnemy(3);
                         break;
                     case 3:
-                        damageEnemy(6);
+                        damageEnemy(12);
                         break;
                     case 4: // sleepwalk, enemy debuff ID=4
                         damageEnemy(2);
@@ -326,7 +357,13 @@ namespace Tools.UI.Card
                         playerhp.AddToCurrentHealth(2);
                         break;
                     case 25:
-                        playerhp.AddToCurrentHealth(4);
+                        if (m_data.rewardBuffs[2])
+                        {
+                            WriteBattleLog("厨师为炖食锅提供了更多恢复。");
+                            playerhp.AddToCurrentHealth(10);
+                        }
+                        else
+                            playerhp.AddToCurrentHealth(4);
                         break;
                     case 26:
                         playerhp.AddToCurrentHealth(8);
@@ -339,16 +376,18 @@ namespace Tools.UI.Card
 
                 switch (m_data.enemy.enemyId)
                 {
-                    case 5: // dragon
+                    case 7: // dragon
                         if (cardsUsed % 3 == 0)
                         {
+                            WriteBattleLog("已使用三张牌，此 Boss 使用梦火力量反弹下次伤害。");
                             fuelUsed();
                             addOrRefreshBuff(enemyBuffs, 100);
                         }
                         break;
-                    case 6: // warboss
+                    case 8: // warboss
                         if (cardsUsed %2 == 0)
                         {
+                            WriteBattleLog("已使用两张牌，此 Boss 使玩家打出的下张卡失效。");
                             addOrRefreshBuff(playerBuffs, 20);
                         }
                         break;
